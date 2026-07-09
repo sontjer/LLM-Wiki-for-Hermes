@@ -38,19 +38,35 @@ LLM Wiki 遵循"源文件不变 + 平行工作区 + 指令驱动"的三层架构
 
 扫描源文件目录所有 .md 文件，对每篇文档：
 1. 读取文件名和前 500 字
-2. 按分类规则分配到对应目录
+2. 通过 embedding 语义分类（默认）或关键词匹配分配到对应目录
 3. 复制到 `Wiki/分类名/` 下
 4. 在副本末尾追加 `## 关联文档` 段落
 5. 更新 `📑索引/` 对应分类页
 
+> 首次全量扫描自动构建 embedding 原型质心，缓存到 `.hermes_cache/`。后续增量在此基础上做语义匹配。
+> 如无 embedding API 环境 (`SILICONFLOW_API_KEY`)，自动降级为关键词匹配。
+
 ### 2. 增量更新（新文档/修改文档）
 
-1. 检查源文件目录中新增或修改的文件（对比 `📑索引/全目录.md` 的记录）
-2. 按分类规则分配到对应目录
-3. 复制并建链（同初始化）
-4. 更新索引
+```
+python3 wiki_init.py --incremental            # embedding 模式（默认）
+python3 wiki_init.py --incremental --classify-mode keyword  # 关键词模式
+```
 
-### 3. 建链操作
+1. 遍历源文件目录，`os.stat()` 对比源文件 vs Wiki 副本的 mtime
+2. embedding 语义分类或关键词匹配 → 分配目录
+3. 复制并建链
+4. 更新受影响分类的索引 + 全目录
+
+> 增量模式纯文件系统操作，零网络零 LLM 消耗。无变更时 <10ms 完成。
+
+### 3. 重建原型质心（分类规则变化时）
+
+```bash
+python3 wiki_init.py --rebuild-prototypes --classify-mode embedding
+```
+
+### 4. 建链操作
 
 对指定或新加入的文档：
 1. 全文扫描，提取关键技术名词
