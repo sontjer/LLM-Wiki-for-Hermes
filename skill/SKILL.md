@@ -181,3 +181,27 @@ gap_scanner 发现缺口 →
 | 概念 | 2-8汉字 + 主义/论/化/观/思想/政策 等 |
 
 各支柱的后缀规则见 `gap_scanner.py` 顶部 PERSON_SUFFIX / EVENT_SUFFIX / ORG_SUFFIX / CONCEPT_SUFFIX 列表，可根据主题扩充。
+
+
+## HTML 输出规范
+
+生成黑红版 HTML 时，使用以下统一方法：
+
+### 人物跳转链接系统
+
+每张人物卡片自动添加 `id="person-{名字}"` 锚点，各时期下方人物标签使用 `href="#person-{名字}"` 实现精确跳转。人物卡片右上角有 `↑ 返回` 链接（hover 显示），使用 `javascript:history.back()` 回到跳转前位置。
+
+### 时序结构
+
+页面按时间轴划分为多个 `<section>`，每个阶段包含：
+- 时间标记 `timeline-marker`（年份+分割线）
+- 事件卡片 `event-card`（含日期、标题、正文、标签）
+- 人物标签 `era-figures`（可点击跳转到人物群像）
+
+### 样式模板
+
+黑红主题 CSS 变量：
+- `--bg: #0c0f1a` 深色背景
+- `--accent: #e74c3c` 红色强调
+- `--gold: #d4a843` 金色点缀
+- 渐变色标题、阴影背景、响应式布局、打印支持
