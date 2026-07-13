@@ -147,3 +147,37 @@ curl -T file.md -u "user:pass" "http://webdav-server/path/file.md"
 - **团队文档库** → 分类改为部门名（产品/设计/后端）
 - **食谱管理** → 分类改为菜系（川菜/日料/烘焙）
 - **论文库** → 分类改为研究方向（NLP/CV/RL）
+
+
+## 自我增殖（知识缺口驱动增长）
+
+### 适用条件
+当 Wiki 已积累 ≥30 篇文档后，可用缺口探测器自动发现尚未入库的知识点。
+
+### 调用方式
+```bash
+# 四支柱模式（通用，任何领域可用）
+python3 脚本/gap_scanner.py /path/to/文库根
+
+# 已知清单模式（精度更高）
+python3 脚本/gap_scanner.py /path/to/文库根 --list entities.json
+```
+
+### 工作流链
+```
+gap_scanner 发现缺口 →
+    人工确认 / opencli wikipedia 批量采集 →
+    wiki_init.py 编译入库 →
+    cross_link_wiki.py 跨链增强 →
+    gap_scanner 二次验证
+```
+
+### 四支柱模式说明
+| 支柱 | 匹配模式 |
+|------|---------|
+| 人物 | 2-4汉字 + 天皇/首相/将军/大将 等 |
+| 事件 | 2-8汉字 + 战争/条约/运动/维新/事变 等 |
+| 机构 | 2-6汉字 + 政府/军/省/部/局/会 等 |
+| 概念 | 2-8汉字 + 主义/论/化/观/思想/政策 等 |
+
+各支柱的后缀规则见 `gap_scanner.py` 顶部 PERSON_SUFFIX / EVENT_SUFFIX / ORG_SUFFIX / CONCEPT_SUFFIX 列表，可根据主题扩充。
